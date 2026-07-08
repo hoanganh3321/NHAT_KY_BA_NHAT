@@ -430,6 +430,37 @@
     .writer-lead { color: var(--ink-soft); margin: 0 0 22px; font-size: 15px; }
     #cloudNote.online { color: #1a7a3c; font-weight: 600; }
     #cloudNote.offline { color: var(--muted); font-style: italic; }
+
+    /* ===== Đăng nhập / Đăng ký ===== */
+    .authbox { margin: 0 0 24px; }
+    .auth-tabs { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .auth-tab {
+      font: inherit; font-weight: 700; font-size: 14px;
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); padding: 9px 16px;
+      border-bottom: 3px solid transparent; margin-bottom: -1px;
+      transition: color .15s, border-color .15s;
+    }
+    .auth-tab:hover { color: var(--ink-soft); }
+    .auth-tab.is-active { color: var(--red-dark); border-bottom-color: var(--red); }
+    .auth-form { max-width: 430px; }
+    .auth-lead { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 16px; }
+    .auth-error {
+      color: var(--red); font-size: 13.5px; font-weight: 600;
+      margin: 14px 0 0; padding: 10px 13px;
+      background: #fbeceb; border: 1px solid #eccaca; border-radius: 4px;
+    }
+    .auth-user {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+      background: #fbf6e9; border: 1px solid #e6d9b3; border-radius: 6px; padding: 13px 18px;
+    }
+    .au-greet { font-size: 15px; color: var(--ink-soft); }
+    .au-greet b { color: var(--red-dark); }
+    body:not(.authed) #authUser { display: none; }
+    .authed #authForms { display: none; }
+    body:not(.authed) #writerArea,
+    body:not(.authed) #manageArea { display: none; }
+
     .wform { display: grid; gap: 16px; }
     .wrow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .wfield label {
@@ -699,6 +730,58 @@
       <h2 class="title" id="writerHeading">Viết thêm nhật ký của bạn</h2>
       <p class="writer-lead" id="cloudNote">Mỗi người có thể ghi lại một trang nhật ký của mình.</p>
 
+      <!-- Đăng nhập / Đăng ký -->
+      <div class="authbox" id="authBox">
+        <div id="authForms">
+          <div class="auth-tabs" role="tablist">
+            <button type="button" id="tabLogin" class="auth-tab is-active">Đăng nhập</button>
+            <button type="button" id="tabRegister" class="auth-tab">Đăng ký</button>
+          </div>
+
+          <form id="loginForm" class="auth-form wform">
+            <p class="auth-lead">Đăng nhập để viết và xem cuốn nhật ký riêng của bạn.</p>
+            <div class="wfield">
+              <label for="lgEmail">Email</label>
+              <input id="lgEmail" type="email" autocomplete="email" required placeholder="ban@email.com">
+            </div>
+            <div class="wfield">
+              <label for="lgPass">Mật khẩu</label>
+              <input id="lgPass" type="password" autocomplete="current-password" required placeholder="••••••">
+            </div>
+            <div class="wactions">
+              <button type="submit" class="btn btn-pdf" id="loginBtn">Đăng nhập</button>
+            </div>
+          </form>
+
+          <form id="registerForm" class="auth-form wform" hidden>
+            <p class="auth-lead">Tạo tài khoản để bắt đầu cuốn nhật ký của riêng bạn.</p>
+            <div class="wfield">
+              <label for="rgName">Tên hiển thị <span class="req">*</span></label>
+              <input id="rgName" type="text" autocomplete="name" required maxlength="80" placeholder="Họ và tên">
+            </div>
+            <div class="wfield">
+              <label for="rgEmail">Email</label>
+              <input id="rgEmail" type="email" autocomplete="email" required placeholder="ban@email.com">
+            </div>
+            <div class="wfield">
+              <label for="rgPass">Mật khẩu <span class="req">*</span></label>
+              <input id="rgPass" type="password" autocomplete="new-password" required minlength="6" placeholder="Tối thiểu 6 ký tự">
+            </div>
+            <div class="wactions">
+              <button type="submit" class="btn btn-pdf" id="registerBtn">Tạo tài khoản</button>
+            </div>
+          </form>
+
+          <p id="authError" class="auth-error" hidden></p>
+        </div>
+
+        <div id="authUser" class="auth-user">
+          <span class="au-greet">Xin chào, <b id="authName"></b></span>
+          <button type="button" class="btn btn-ghost" id="logoutBtn">Đăng xuất</button>
+        </div>
+      </div>
+
+      <div id="writerArea">
       <form id="entryForm" class="wform">
         <div class="wrow">
           <div class="wfield">
@@ -730,11 +813,12 @@
         <div class="preview-label">Xem trước — trang nhật ký điện tử</div>
         <div id="previewPages"></div>
       </div>
+      </div><!-- /#writerArea -->
     </div>
 
-    <div class="article entries">
+    <div class="article entries" id="manageArea">
       <div class="entries-head">
-        <span class="kicker">Nhật ký cộng đồng</span>
+        <span class="kicker">Nhật ký của bạn</span>
         <div class="entries-tools">
           <button type="button" class="btn btn-ghost" id="exportBtn">⬇ Xuất file</button>
           <label for="importInput" class="btn btn-ghost">⬆ Nhập file</label>
@@ -902,6 +986,18 @@
     const pagesEl   = document.querySelector('.pages');
     const pageBack  = document.getElementById('pageBack');
     const PUBLISH_LABEL = '🌐 Public — đăng vào cuốn nhật ký';
+
+    // Phần tử đăng nhập / đăng ký
+    const authBox     = document.getElementById('authBox');
+    const authNameEl  = document.getElementById('authName');
+    const authError   = document.getElementById('authError');
+    const loginForm   = document.getElementById('loginForm');
+    const registerForm= document.getElementById('registerForm');
+    const loginBtn    = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const logoutBtn   = document.getElementById('logoutBtn');
+    const tabLogin    = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
 
     let entries = [];
     let editingId = null;
@@ -1142,25 +1238,117 @@
     }
 
     let backend;
+    let currentUser = null;   // người dùng đang đăng nhập (chế độ Firebase)
 
-    async function makeCloudBackend() {
+    // ---- Ánh xạ mã lỗi Firebase Auth sang tiếng Việt ----
+    function authErrorMessage(err) {
+      const map = {
+        'auth/invalid-email':        'Email không hợp lệ.',
+        'auth/missing-password':     'Vui lòng nhập mật khẩu.',
+        'auth/user-not-found':       'Không tìm thấy tài khoản với email này.',
+        'auth/wrong-password':       'Sai mật khẩu.',
+        'auth/invalid-credential':   'Email hoặc mật khẩu không đúng.',
+        'auth/email-already-in-use': 'Email này đã được đăng ký. Hãy đăng nhập.',
+        'auth/weak-password':        'Mật khẩu quá yếu (tối thiểu 6 ký tự).',
+        'auth/too-many-requests':    'Thử quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.',
+        'auth/network-request-failed': 'Lỗi mạng. Kiểm tra kết nối Internet.',
+        'auth/operation-not-allowed': 'Chưa bật đăng nhập Email/Mật khẩu trong Firebase Console.'
+      };
+      return map[err && err.code] || ('Có lỗi xảy ra: ' + ((err && err.message) || err));
+    }
+    function showAuthError(err) {
+      authError.textContent = authErrorMessage(err);
+      authError.hidden = false;
+    }
+    function switchAuthTab(which) {
+      const isLogin = which === 'login';
+      tabLogin.classList.toggle('is-active', isLogin);
+      tabRegister.classList.toggle('is-active', !isLogin);
+      loginForm.hidden = !isLogin;
+      registerForm.hidden = isLogin;
+      authError.hidden = true;
+    }
+    tabLogin.addEventListener('click', () => switchAuthTab('login'));
+    tabRegister.addEventListener('click', () => switchAuthTab('register'));
+
+    // ---- Khởi tạo Firebase: xác thực + Firestore (mỗi người một cuốn nhật ký riêng) ----
+    async function initCloud() {
       const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-      const { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp } =
+      const { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp, query, where } =
         await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-      const db = getFirestore(initializeApp(firebaseConfig));
-      const col = collection(db, 'entries');
-      onSnapshot(col, snap => {
-        entries = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
-        render();
-      }, err => {
-        console.error(err);
-        listEl.innerHTML = '<p class="empty">Không kết nối được máy chủ. Kiểm tra cấu hình Firebase / quy tắc bảo mật.</p>';
-      });
-      return {
-        async add(data) { await addDoc(col, Object.assign({ createdAt: serverTimestamp() }, data)); },
+      const { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } =
+        await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+
+      const app  = initializeApp(firebaseConfig);
+      const db   = getFirestore(app);
+      const auth = getAuth(app);
+      const col  = collection(db, 'entries');
+
+      // Các thao tác dữ liệu — luôn gắn uid của người đang đăng nhập
+      backend = {
+        async add(data) {
+          if (!currentUser) throw new Error('Bạn cần đăng nhập trước.');
+          await addDoc(col, Object.assign({ uid: currentUser.uid, createdAt: serverTimestamp() }, data));
+        },
         async update(id, data) { await updateDoc(doc(db, 'entries', id), data); },
         async remove(id) { await deleteDoc(doc(db, 'entries', id)); }
       };
+
+      // Đăng nhập
+      loginForm.addEventListener('submit', async ev => {
+        ev.preventDefault();
+        authError.hidden = true;
+        loginBtn.disabled = true;
+        try {
+          await signInWithEmailAndPassword(auth, document.getElementById('lgEmail').value.trim(), document.getElementById('lgPass').value);
+          loginForm.reset();
+        } catch (e) { showAuthError(e); }
+        loginBtn.disabled = false;
+      });
+
+      // Đăng ký
+      registerForm.addEventListener('submit', async ev => {
+        ev.preventDefault();
+        authError.hidden = true;
+        registerBtn.disabled = true;
+        try {
+          const name = document.getElementById('rgName').value.trim();
+          const cred = await createUserWithEmailAndPassword(auth, document.getElementById('rgEmail').value.trim(), document.getElementById('rgPass').value);
+          if (name) await updateProfile(cred.user, { displayName: name });
+          if (name) { authNameEl.textContent = name; const a = document.getElementById('fAuthor'); if (a) a.value = name; }
+          registerForm.reset();
+        } catch (e) { showAuthError(e); }
+        registerBtn.disabled = false;
+      });
+
+      // Đăng xuất
+      logoutBtn.addEventListener('click', () => signOut(auth));
+
+      // Theo dõi trạng thái đăng nhập
+      let unsub = null;
+      onAuthStateChanged(auth, user => {
+        currentUser = user;
+        if (unsub) { unsub(); unsub = null; }
+        if (user) {
+          document.body.classList.add('authed');
+          authNameEl.textContent = user.displayName || user.email;
+          const a = document.getElementById('fAuthor');
+          if (a && !a.value) a.value = user.displayName || '';
+          // Chỉ tải các bài của chính người này
+          unsub = onSnapshot(query(col, where('uid', '==', user.uid)), snap => {
+            entries = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+            render();
+          }, err => {
+            console.error(err);
+            listEl.innerHTML = '<p class="empty">Không tải được nhật ký của bạn. Kiểm tra kết nối / quy tắc bảo mật Firestore.</p>';
+          });
+        } else {
+          document.body.classList.remove('authed');
+          switchAuthTab('login');
+          entries = [];
+          render();
+        }
+      });
     }
 
     function makeLocalBackend() {
@@ -1367,14 +1555,17 @@
       updatePreview();
       if (CLOUD) {
         try {
-          backend = await makeCloudBackend();
-          noteEl.textContent = '🌐 Nhật ký được chia sẻ chung cho mọi người — cập nhật ngay khi có bài mới.';
+          await initCloud();
+          noteEl.textContent = '🔒 Nhật ký riêng của bạn — đăng nhập để viết và xem lại các trang của mình.';
           noteEl.classList.add('online');
           return;
         } catch (e) {
           console.error('Firebase lỗi, chuyển sang lưu trên máy:', e);
         }
       }
+      // Không kết nối được Firebase: chạy cục bộ (1 cuốn trên máy, không cần đăng nhập)
+      document.body.classList.add('authed');
+      if (authBox) authBox.style.display = 'none';
       backend = makeLocalBackend();
       noteEl.textContent = 'Bài viết đang lưu tạm trên máy của bạn (chưa kết nối máy chủ chung).';
       noteEl.classList.add('offline');
