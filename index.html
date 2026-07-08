@@ -425,6 +425,84 @@
       .article { padding: 20px 16px; }
       .pages { gap: 22px; }
     }
+
+    /* ===== Khu vực bạn đọc tự viết nhật ký ===== */
+    .writer-lead { color: var(--ink-soft); margin: 0 0 22px; font-size: 15px; }
+    #cloudNote.online { color: #1a7a3c; font-weight: 600; }
+    #cloudNote.offline { color: var(--muted); font-style: italic; }
+    .wform { display: grid; gap: 16px; }
+    .wrow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .wfield label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--red-dark);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 6px;
+    }
+    .wfield .req { color: var(--red); }
+    .wform input, .wform textarea {
+      width: 100%;
+      font: inherit;
+      color: var(--ink);
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+    }
+    .wform input:focus, .wform textarea:focus {
+      outline: none;
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(160,20,24,.12);
+    }
+    .wform textarea { min-height: 160px; resize: vertical; line-height: 1.7; font-family: var(--serif); }
+    .wactions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn[disabled] { opacity: .55; cursor: default; }
+
+    .entries { margin-top: 26px; }
+    .entries-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .entries-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+    .entries-tools .btn { padding: 7px 13px; font-size: 13px; }
+    .entries .title .count {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--red);
+      border-radius: 20px;
+      padding: 1px 11px;
+      vertical-align: middle;
+    }
+    .entry-list { display: flex; flex-direction: column; gap: 18px; }
+    .entry {
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--red);
+      border-radius: 4px;
+      background: #fff;
+      padding: 16px 18px;
+    }
+    .entry .e-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .entry .e-title { margin: 0; font-family: var(--serif); font-size: 20px; font-weight: 800; color: var(--ink); }
+    .entry .e-meta { font-size: 13px; color: var(--muted); }
+    .entry .e-meta .who { color: var(--red-dark); font-weight: 700; }
+    .entry .e-body { margin: 10px 0 0; white-space: pre-wrap; line-height: 1.75; font-family: var(--serif); color: var(--ink-soft); }
+    .entry .e-tools { margin-top: 12px; display: flex; gap: 8px; }
+    .entry .e-tools button {
+      font: inherit; font-size: 13px;
+      border: 1px solid var(--line);
+      background: #fafafa; color: var(--ink-soft);
+      border-radius: 4px; padding: 5px 14px; cursor: pointer;
+      transition: background .15s;
+    }
+    .entry .e-tools button:hover { background: #f0f0f0; }
+    .entry .e-tools button.del { color: var(--red); border-color: #eccaca; }
+    .entry .e-tools button.del:hover { background: #fbeceb; }
+    .entries .empty { color: var(--muted); font-style: italic; padding: 12px 0; }
+
+    @media (max-width: 560px) {
+      .wrow { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -584,6 +662,53 @@
     </article>
   </main>
 
+  <!-- Bạn đọc tự viết nhật ký -->
+  <section class="layout" id="viet" aria-labelledby="writerHeading">
+    <div class="article writer">
+      <span class="kicker">Bạn đọc viết</span>
+      <h2 class="title" id="writerHeading">Viết thêm nhật ký của bạn</h2>
+      <p class="writer-lead" id="cloudNote">Mỗi người có thể ghi lại một trang nhật ký của mình.</p>
+
+      <form id="entryForm" class="wform">
+        <div class="wrow">
+          <div class="wfield">
+            <label for="fAuthor">Người viết</label>
+            <input id="fAuthor" type="text" placeholder="Họ và tên" maxlength="80" autocomplete="name">
+          </div>
+          <div class="wfield">
+            <label for="fDate">Ngày</label>
+            <input id="fDate" type="date">
+          </div>
+        </div>
+        <div class="wfield">
+          <label for="fTitle">Tiêu đề</label>
+          <input id="fTitle" type="text" placeholder="Ví dụ: Một ngày ở cơ quan…" maxlength="120">
+        </div>
+        <div class="wfield">
+          <label for="fBody">Nội dung nhật ký <span class="req">*</span></label>
+          <textarea id="fBody" placeholder="Hôm nay…" required></textarea>
+        </div>
+        <div class="wactions">
+          <button type="submit" class="btn btn-pdf" id="submitBtn">Đăng nhật ký</button>
+          <button type="button" class="btn btn-ghost" id="cancelEdit" hidden>Hủy sửa</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="article entries">
+      <div class="entries-head">
+        <span class="kicker">Nhật ký cộng đồng</span>
+        <div class="entries-tools">
+          <button type="button" class="btn btn-ghost" id="exportBtn">⬇ Xuất file</button>
+          <label for="importInput" class="btn btn-ghost">⬆ Nhập file</label>
+          <input id="importInput" type="file" accept="application/json" hidden>
+        </div>
+      </div>
+      <h2 class="title">Bài đã đăng <span class="count" id="entryCount">0</span></h2>
+      <div id="entryList" class="entry-list"></div>
+    </div>
+  </section>
+
   <!-- Chân trang -->
   <footer class="site" id="footer">
     <div class="wrap">
@@ -684,6 +809,201 @@
         else if (e.key === 'ArrowLeft') show(cur - 1);
         else if (e.key === 'ArrowRight') show(cur + 1);
       });
+    })();
+  </script>
+
+  <script type="module">
+    // ====== Bạn đọc tự viết & chia sẻ nhật ký (Firebase Firestore) ======
+    // DB lưu chung trên Firebase — mọi người cùng thấy. Mất mạng thì tạm lưu trên máy.
+    const firebaseConfig = {
+      apiKey:            "AIzaSyAZwtIo2AxkEIPxakUiPn1xGzzOCqTeONE",
+      authDomain:        "nhat-ky-ba-nhat.firebaseapp.com",
+      projectId:         "nhat-ky-ba-nhat",
+      storageBucket:     "nhat-ky-ba-nhat.firebasestorage.app",
+      messagingSenderId: "355364236260",
+      appId:             "1:355364236260:web:c8807d96b6f8b7cf26f5f1",
+      measurementId:     "G-X314JZQDQ7"
+    };
+    const CLOUD = firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf('PASTE') === -1;
+    const STORE_KEY = 'nkba-entries-v1';
+
+    const form      = document.getElementById('entryForm');
+    const listEl    = document.getElementById('entryList');
+    const countEl   = document.getElementById('entryCount');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelBtn = document.getElementById('cancelEdit');
+    const dateInput = document.getElementById('fDate');
+    const noteEl    = document.getElementById('cloudNote');
+
+    let entries = [];
+    let editingId = null;
+
+    dateInput.value = new Date().toISOString().slice(0, 10);
+
+    const esc = s => String(s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmtDate = iso => {
+      if (!iso) return '';
+      const p = String(iso).split('-');
+      return p.length === 3 ? ('Ngày ' + p[2] + '/' + p[1] + '/' + p[0]) : iso;
+    };
+
+    function render() {
+      const list = entries.slice().sort((a, b) =>
+        (b.date || '').localeCompare(a.date || '') || String(b.id).localeCompare(String(a.id)));
+      countEl.textContent = list.length;
+      if (!list.length) {
+        listEl.innerHTML = '<p class="empty">Chưa có bài nào. Hãy là người đầu tiên viết một trang nhật ký!</p>';
+        return;
+      }
+      listEl.innerHTML = list.map(e => '' +
+        '<article class="entry" data-id="' + esc(e.id) + '">' +
+          '<div class="e-head">' +
+            '<h3 class="e-title">' + (e.title ? esc(e.title) : '(Không có tiêu đề)') + '</h3>' +
+            '<span class="e-meta">' +
+              (e.author ? '<span class="who">' + esc(e.author) + '</span> · ' : '') + fmtDate(e.date) +
+            '</span>' +
+          '</div>' +
+          '<p class="e-body">' + esc(e.body) + '</p>' +
+          '<div class="e-tools">' +
+            '<button type="button" data-act="edit">Sửa</button>' +
+            '<button type="button" data-act="del" class="del">Xóa</button>' +
+          '</div>' +
+        '</article>').join('');
+    }
+
+    let backend;
+
+    async function makeCloudBackend() {
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+      const { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp } =
+        await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      const db = getFirestore(initializeApp(firebaseConfig));
+      const col = collection(db, 'entries');
+      onSnapshot(col, snap => {
+        entries = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+        render();
+      }, err => {
+        console.error(err);
+        listEl.innerHTML = '<p class="empty">Không kết nối được máy chủ. Kiểm tra cấu hình Firebase / quy tắc bảo mật.</p>';
+      });
+      return {
+        async add(data) { await addDoc(col, Object.assign({ createdAt: serverTimestamp() }, data)); },
+        async update(id, data) { await updateDoc(doc(db, 'entries', id), data); },
+        async remove(id) { await deleteDoc(doc(db, 'entries', id)); }
+      };
+    }
+
+    function makeLocalBackend() {
+      const read = () => { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; } };
+      const write = arr => localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+      const refresh = () => { entries = read(); render(); };
+      const newId = () => 'l' + Date.now() + Math.floor(Math.random() * 1000);
+      refresh();
+      return {
+        async add(data) { const a = read(); a.push(Object.assign({ id: newId() }, data)); write(a); refresh(); },
+        async update(id, data) { write(read().map(e => e.id === id ? Object.assign(e, data) : e)); refresh(); },
+        async remove(id) { write(read().filter(e => e.id !== id)); refresh(); }
+      };
+    }
+
+    form.addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const body = document.getElementById('fBody').value.trim();
+      if (!body) return;
+      const data = {
+        author: document.getElementById('fAuthor').value.trim(),
+        date:   dateInput.value,
+        title:  document.getElementById('fTitle').value.trim(),
+        body
+      };
+      submitBtn.disabled = true;
+      try {
+        if (editingId) { await backend.update(editingId, data); }
+        else { await backend.add(data); }
+      } catch (e) { alert('Không lưu được: ' + e.message); }
+      submitBtn.disabled = false;
+      editingId = null;
+      submitBtn.textContent = 'Đăng nhật ký';
+      cancelBtn.hidden = true;
+      form.reset();
+      dateInput.value = new Date().toISOString().slice(0, 10);
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      editingId = null;
+      form.reset();
+      dateInput.value = new Date().toISOString().slice(0, 10);
+      submitBtn.textContent = 'Đăng nhật ký';
+      cancelBtn.hidden = true;
+    });
+
+    listEl.addEventListener('click', async ev => {
+      const b = ev.target.closest('button');
+      if (!b) return;
+      const id = b.closest('.entry').getAttribute('data-id');
+      const entry = entries.find(e => String(e.id) === id);
+      if (!entry) return;
+      if (b.getAttribute('data-act') === 'del') {
+        if (confirm('Xóa bài nhật ký này?')) {
+          try { await backend.remove(entry.id); } catch (e) { alert('Không xóa được: ' + e.message); }
+        }
+      } else {
+        document.getElementById('fAuthor').value = entry.author || '';
+        dateInput.value = entry.date || '';
+        document.getElementById('fTitle').value = entry.title || '';
+        document.getElementById('fBody').value = entry.body || '';
+        editingId = entry.id;
+        submitBtn.textContent = 'Cập nhật';
+        cancelBtn.hidden = false;
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'nhat-ky-ba-nhat.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+    document.getElementById('importInput').addEventListener('change', ev => {
+      const file = ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const incoming = JSON.parse(reader.result);
+          if (!Array.isArray(incoming)) throw 0;
+          let n = 0;
+          for (const e of incoming) {
+            if (e && e.body) {
+              await backend.add({ author: e.author || '', date: e.date || '', title: e.title || '', body: e.body });
+              n++;
+            }
+          }
+          alert('Đã nhập ' + n + ' bài nhật ký.');
+        } catch (e) { alert('File không hợp lệ.'); }
+        ev.target.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    (async () => {
+      if (CLOUD) {
+        try {
+          backend = await makeCloudBackend();
+          noteEl.textContent = '🌐 Nhật ký được chia sẻ chung cho mọi người — cập nhật ngay khi có bài mới.';
+          noteEl.classList.add('online');
+          return;
+        } catch (e) {
+          console.error('Firebase lỗi, chuyển sang lưu trên máy:', e);
+        }
+      }
+      backend = makeLocalBackend();
+      noteEl.textContent = 'Bài viết đang lưu tạm trên máy của bạn (chưa kết nối máy chủ chung).';
+      noteEl.classList.add('offline');
     })();
   </script>
 
