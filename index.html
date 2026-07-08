@@ -624,10 +624,10 @@
       </p>
 
       <div class="actions">
-        <a class="btn btn-pdf" href="docs/nhat-ky-ba-nhat.pdf" download="Nhat-ky-Ba-Nhat.pdf">
+        <button class="btn btn-pdf" type="button" id="downloadPdf">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.42l2.3 2.3V4a1 1 0 0 1 1-1zM5 18a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"/></svg>
-          Tải bản PDF
-        </a>
+          <span id="pdfBtnLabel">Tải bản PDF (cả bài mới)</span>
+        </button>
         <button class="btn btn-ghost" type="button" id="openFirst">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3a7 7 0 1 1-4.9 12l-2.8 2.8a1 1 0 0 1-1.4-1.42L3.7 13.6A7 7 0 0 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a1 1 0 0 1 1 1v1h1a1 1 0 1 1 0 2h-1v1a1 1 0 1 1-2 0v-1H9a1 1 0 1 1 0-2h1V8a1 1 0 0 1 1-1z"/></svg>
           Đọc phóng to
@@ -1271,6 +1271,64 @@
       const e = currentFormEntry();
       if (!e.body.trim() && !e.title.trim()) { alert('Hãy viết nội dung trước khi tải ảnh.'); return; }
       downloadEntryImage(e);
+    });
+
+    // ---- Tải TOÀN BỘ cuốn nhật ký thành PDF (gồm cả bài mới đăng) ----
+    function loadJsPDF() {
+      if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve();
+      return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload = res;
+        s.onerror = () => rej(new Error('Không tải được thư viện tạo PDF (cần mạng).'));
+        document.head.appendChild(s);
+      });
+    }
+    const loadImage = src => new Promise((res, rej) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = () => rej(new Error('Không tải được ảnh: ' + src));
+      im.src = src;
+    });
+
+    const pdfBtn = document.getElementById('downloadPdf');
+    const pdfLabel = document.getElementById('pdfBtnLabel');
+    pdfBtn.addEventListener('click', async () => {
+      const old = pdfLabel.textContent;
+      pdfBtn.disabled = true; pdfLabel.textContent = 'Đang tạo PDF…';
+      try {
+        await loadJsPDF();
+        const JsPDF = window.jspdf.jsPDF;
+        const figs = [...pagesEl.querySelectorAll('figure.page')];
+        let pdf = null;
+        for (const fig of figs) {
+          const cv = fig.querySelector('canvas');
+          const img = fig.querySelector('img');
+          let dataUrl, w, h;
+          if (cv) {
+            w = cv.width; h = cv.height;
+            dataUrl = cv.toDataURL('image/jpeg', 0.92);
+          } else if (img) {
+            const el = await loadImage(img.currentSrc || img.src);
+            w = el.naturalWidth || el.width; h = el.naturalHeight || el.height;
+            const tmp = document.createElement('canvas');
+            tmp.width = w; tmp.height = h;
+            tmp.getContext('2d').drawImage(el, 0, 0);
+            dataUrl = tmp.toDataURL('image/jpeg', 0.85);
+          } else { continue; }
+          const orient = w > h ? 'l' : 'p';
+          if (!pdf) pdf = new JsPDF({ unit: 'px', format: [w, h], orientation: orient, compress: true });
+          else pdf.addPage([w, h], orient);
+          pdf.addImage(dataUrl, 'JPEG', 0, 0, w, h);
+        }
+        if (!pdf) throw new Error('Không có trang nào để xuất.');
+        pdf.save('Nhat-ky-Ba-Nhat.pdf');
+      } catch (e) {
+        alert('Tải PDF thất bại: ' + e.message);
+        console.error(e);
+      } finally {
+        pdfBtn.disabled = false; pdfLabel.textContent = old;
+      }
     });
 
     document.getElementById('exportBtn').addEventListener('click', () => {
