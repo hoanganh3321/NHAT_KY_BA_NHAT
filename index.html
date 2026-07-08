@@ -503,6 +503,36 @@
     @media (max-width: 560px) {
       .wrow { grid-template-columns: 1fr; }
     }
+
+    /* ===== Trang nhật ký điện tử (canvas trên giấy kẻ dòng) ===== */
+    @font-face {
+      font-family: "DejaVu Serif";
+      src: url("fonts/DejaVuSerif.ttf") format("truetype");
+      font-weight: normal;
+      font-display: swap;
+    }
+    .preview-wrap { margin-top: 22px; }
+    .preview-label {
+      font-size: 13px; font-weight: 700; color: var(--red-dark);
+      text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px;
+    }
+    .diary-canvas {
+      display: block;
+      width: 100%;
+      max-width: 460px;
+      height: auto;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      box-shadow: 0 6px 22px rgba(20,20,20,.12);
+      background: #fff;
+    }
+    .diary-canvas + .diary-canvas { margin-top: 16px; }
+    .entry-page { display: flex; flex-direction: column; gap: 12px; }
+    .entry-page .e-meta { text-align: center; }
+    .entry-page .e-tools { justify-content: center; }
+    .e-tools button.img { color: var(--red-dark); border-color: #d8c9a0; background: #fbf6e9; }
+    .e-tools button.img:hover { background: #f4ead0; }
   </style>
 </head>
 <body>
@@ -691,8 +721,14 @@
         <div class="wactions">
           <button type="submit" class="btn btn-pdf" id="submitBtn">Đăng nhật ký</button>
           <button type="button" class="btn btn-ghost" id="cancelEdit" hidden>Hủy sửa</button>
+          <button type="button" class="btn btn-ghost" id="previewDownload">⬇ Tải ảnh trang này</button>
         </div>
       </form>
+
+      <div class="preview-wrap">
+        <div class="preview-label">Xem trước — trang nhật ký điện tử</div>
+        <div id="previewPages"></div>
+      </div>
     </div>
 
     <div class="article entries">
@@ -848,28 +884,167 @@
       return p.length === 3 ? ('Ngày ' + p[2] + '/' + p[1] + '/' + p[0]) : iso;
     };
 
+    // ====== Vẽ trang nhật ký điện tử lên giấy kẻ dòng (docs/img.png) ======
+    const PAGE = {
+      W: 427, H: 602,            // kích thước ảnh nền
+      line0: 118,                // y baseline của dòng viết đầu tiên
+      pitch: 18,                 // khoảng cách giữa các dòng kẻ
+      linesPerPage: 27,          // số dòng mỗi trang
+      left: 30, right: 400,      // lề trái / phải của chữ
+      fontPx: 14.5,              // cỡ chữ thân bài
+      ink: '#286181',            // màu mực
+      dateY: 56,                 // baseline dòng "Ngày ..."
+      dateCenters: [337, 362, 387] // tâm 3 nhóm dd / mm / yyyy
+    };
+    const FONT = f => (f || '') + PAGE.fontPx + 'px "DejaVu Serif", Georgia, "Times New Roman", serif';
+
+    let bgImage = null;
+    function loadAssets() {
+      const fontP = (document.fonts && document.fonts.load)
+        ? document.fonts.load('14px "DejaVu Serif"').catch(() => {})
+        : Promise.resolve();
+      const imgP = new Promise(res => {
+        const im = new Image();
+        im.onload = () => { bgImage = im; res(); };
+        im.onerror = () => res();
+        im.src = 'docs/img.png';
+      });
+      return Promise.all([fontP, imgP]);
+    }
+
+    function wrapText(ctx, text, maxW) {
+      const out = [];
+      const paras = String(text || '').replace(/\r/g, '').split('\n');
+      for (const para of paras) {
+        if (para === '') { out.push(''); continue; }
+        let line = '';
+        for (const word of para.split(/(\s+)/)) {
+          const test = line + word;
+          if (ctx.measureText(test).width > maxW && line.trim()) {
+            out.push(line.replace(/\s+$/, ''));
+            line = word.replace(/^\s+/, '');
+          } else { line = test; }
+        }
+        out.push(line.replace(/\s+$/, ''));
+      }
+      return out;
+    }
+
+    const measCtx = document.createElement('canvas').getContext('2d');
+    function buildLines(entry) {
+      const maxW = PAGE.right - PAGE.left;
+      const lines = [];
+      if (entry.title) {
+        measCtx.font = FONT('700 ');
+        for (const t of wrapText(measCtx, entry.title, maxW)) lines.push({ t, bold: true });
+      }
+      measCtx.font = FONT('');
+      for (const t of wrapText(measCtx, entry.body, maxW)) lines.push({ t });
+      if (entry.author) { lines.push({ t: '' }); lines.push({ t: '— ' + entry.author, align: 'right' }); }
+      return lines;
+    }
+
+    function drawPage(canvas, lines, dateISO, scale) {
+      const P = PAGE, S = scale || 2;
+      canvas.width = P.W * S; canvas.height = P.H * S;
+      const c = canvas.getContext('2d');
+      c.setTransform(S, 0, 0, S, 0, 0);
+      if (bgImage) c.drawImage(bgImage, 0, 0, P.W, P.H);
+      else { c.fillStyle = '#fff'; c.fillRect(0, 0, P.W, P.H); }
+
+      c.fillStyle = P.ink;
+      c.textBaseline = 'alphabetic';
+
+      // Ngày ở góc phải trên (đè lên các chấm)
+      const p = String(dateISO || '').split('-');
+      if (p.length === 3) {
+        c.textAlign = 'center';
+        c.font = '12px "DejaVu Serif", Georgia, serif';
+        c.fillText(p[2], P.dateCenters[0], P.dateY);
+        c.fillText(p[1], P.dateCenters[1], P.dateY);
+        c.fillText(p[0], P.dateCenters[2], P.dateY);
+        c.textAlign = 'left';
+      }
+
+      // Nội dung trên từng dòng kẻ
+      for (let i = 0; i < lines.length; i++) {
+        const ln = lines[i];
+        if (!ln.t) continue;
+        c.font = FONT(ln.bold ? '700 ' : '');
+        const y = P.line0 + i * P.pitch;
+        if (ln.align === 'right') {
+          c.fillText(ln.t, P.right - c.measureText(ln.t).width, y);
+        } else {
+          c.fillText(ln.t, P.left, y);
+        }
+      }
+    }
+
+    function renderDiaryInto(container, entry, scale) {
+      container.innerHTML = '';
+      const lines = buildLines(entry);
+      const per = PAGE.linesPerPage;
+      const pageCount = Math.max(1, Math.ceil(lines.length / per));
+      const canvases = [];
+      for (let pg = 0; pg < pageCount; pg++) {
+        const cv = document.createElement('canvas');
+        cv.className = 'diary-canvas';
+        drawPage(cv, lines.slice(pg * per, pg * per + per), entry.date, scale);
+        container.appendChild(cv);
+        canvases.push(cv);
+      }
+      return canvases;
+    }
+
+    function downloadEntryImage(entry) {
+      const box = document.createElement('div');
+      const canvases = renderDiaryInto(box, entry, 3);
+      const base = (entry.title || 'nhat-ky')
+        .replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'nhat-ky';
+      canvases.forEach((cv, i) => {
+        cv.toBlob(blob => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = base + (canvases.length > 1 ? '-trang' + (i + 1) : '') + '.png';
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+        }, 'image/png');
+      });
+    }
+
     function render() {
       const list = entries.slice().sort((a, b) =>
         (b.date || '').localeCompare(a.date || '') || String(b.id).localeCompare(String(a.id)));
       countEl.textContent = list.length;
+      listEl.innerHTML = '';
       if (!list.length) {
         listEl.innerHTML = '<p class="empty">Chưa có bài nào. Hãy là người đầu tiên viết một trang nhật ký!</p>';
         return;
       }
-      listEl.innerHTML = list.map(e => '' +
-        '<article class="entry" data-id="' + esc(e.id) + '">' +
-          '<div class="e-head">' +
-            '<h3 class="e-title">' + (e.title ? esc(e.title) : '(Không có tiêu đề)') + '</h3>' +
-            '<span class="e-meta">' +
-              (e.author ? '<span class="who">' + esc(e.author) + '</span> · ' : '') + fmtDate(e.date) +
-            '</span>' +
-          '</div>' +
-          '<p class="e-body">' + esc(e.body) + '</p>' +
-          '<div class="e-tools">' +
-            '<button type="button" data-act="edit">Sửa</button>' +
-            '<button type="button" data-act="del" class="del">Xóa</button>' +
-          '</div>' +
-        '</article>').join('');
+      for (const e of list) {
+        const wrap = document.createElement('div');
+        wrap.className = 'entry-page';
+        wrap.dataset.id = e.id;
+
+        const pagesBox = document.createElement('div');
+        renderDiaryInto(pagesBox, e, 2);
+        wrap.appendChild(pagesBox);
+
+        const meta = document.createElement('div');
+        meta.className = 'e-meta';
+        meta.innerHTML = (e.author ? '<span class="who">' + esc(e.author) + '</span> · ' : '') + fmtDate(e.date);
+        wrap.appendChild(meta);
+
+        const tools = document.createElement('div');
+        tools.className = 'e-tools';
+        tools.innerHTML =
+          '<button type="button" data-act="img" class="img">⬇ Tải ảnh</button>' +
+          '<button type="button" data-act="edit">Sửa</button>' +
+          '<button type="button" data-act="del" class="del">Xóa</button>';
+        wrap.appendChild(tools);
+
+        listEl.appendChild(wrap);
+      }
     }
 
     let backend;
@@ -928,6 +1103,7 @@
       cancelBtn.hidden = true;
       form.reset();
       dateInput.value = new Date().toISOString().slice(0, 10);
+      updatePreview();
     });
 
     cancelBtn.addEventListener('click', () => {
@@ -936,18 +1112,23 @@
       dateInput.value = new Date().toISOString().slice(0, 10);
       submitBtn.textContent = 'Đăng nhật ký';
       cancelBtn.hidden = true;
+      updatePreview();
     });
 
     listEl.addEventListener('click', async ev => {
       const b = ev.target.closest('button');
       if (!b) return;
-      const id = b.closest('.entry').getAttribute('data-id');
-      const entry = entries.find(e => String(e.id) === id);
+      const host = b.closest('.entry-page');
+      if (!host) return;
+      const entry = entries.find(e => String(e.id) === host.getAttribute('data-id'));
       if (!entry) return;
-      if (b.getAttribute('data-act') === 'del') {
+      const act = b.getAttribute('data-act');
+      if (act === 'del') {
         if (confirm('Xóa bài nhật ký này?')) {
           try { await backend.remove(entry.id); } catch (e) { alert('Không xóa được: ' + e.message); }
         }
+      } else if (act === 'img') {
+        downloadEntryImage(entry);
       } else {
         document.getElementById('fAuthor').value = entry.author || '';
         dateInput.value = entry.date || '';
@@ -956,8 +1137,34 @@
         editingId = entry.id;
         submitBtn.textContent = 'Cập nhật';
         cancelBtn.hidden = false;
+        updatePreview();
         form.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
+    });
+
+    // ---- Xem trước trực tiếp khi gõ ----
+    const previewBox = document.getElementById('previewPages');
+    const currentFormEntry = () => ({
+      author: document.getElementById('fAuthor').value.trim(),
+      date:   dateInput.value,
+      title:  document.getElementById('fTitle').value.trim(),
+      body:   document.getElementById('fBody').value
+    });
+    let previewTimer = null;
+    function updatePreview() {
+      renderDiaryInto(previewBox, currentFormEntry(), 2);
+    }
+    ['fAuthor', 'fTitle', 'fBody'].forEach(id =>
+      document.getElementById(id).addEventListener('input', () => {
+        clearTimeout(previewTimer);
+        previewTimer = setTimeout(updatePreview, 120);
+      }));
+    dateInput.addEventListener('change', updatePreview);
+
+    document.getElementById('previewDownload').addEventListener('click', () => {
+      const e = currentFormEntry();
+      if (!e.body.trim() && !e.title.trim()) { alert('Hãy viết nội dung trước khi tải ảnh.'); return; }
+      downloadEntryImage(e);
     });
 
     document.getElementById('exportBtn').addEventListener('click', () => {
@@ -991,6 +1198,8 @@
     });
 
     (async () => {
+      await loadAssets();      // nạp ảnh nền + font DejaVu Serif trước khi vẽ
+      updatePreview();
       if (CLOUD) {
         try {
           backend = await makeCloudBackend();
@@ -1005,6 +1214,11 @@
       noteEl.textContent = 'Bài viết đang lưu tạm trên máy của bạn (chưa kết nối máy chủ chung).';
       noteEl.classList.add('offline');
     })();
+
+    // Vẽ lại khi font đã sẵn sàng (phòng khi glyph nạp trễ)
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { render(); updatePreview(); });
+    }
   </script>
 
 </body>

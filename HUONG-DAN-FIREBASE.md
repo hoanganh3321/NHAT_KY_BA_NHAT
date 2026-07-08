@@ -26,6 +26,7 @@ Trang phải mở qua HTTP (không mở bằng `file://`, vì import Firebase qu
 Dùng bất kỳ static server nào, ví dụ tiện ích **Live Server** của VS Code, rồi mở trang.
 
 
+
 Thấy dòng **“🌐 Nhật ký được chia sẻ chung…”** dưới mục *Viết thêm nhật ký của bạn* là OK.
 
 ## Xuất bản GitHub Pages
