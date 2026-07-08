@@ -1053,6 +1053,16 @@
       return canvases;
     }
 
+    // Render 1 trang của bài đăng ở độ phân giải cao (cho PDF)
+    function renderEntryPageHiRes(entry, pageIndex, scale) {
+      const lines = buildLines(entry);
+      const per = PAGE.linesPerPage;
+      const slice = lines.slice(pageIndex * per, pageIndex * per + per);
+      const cv = document.createElement('canvas');
+      drawPage(cv, slice, entry.date, scale);
+      return cv;
+    }
+
     function downloadEntryImage(entry) {
       const box = document.createElement('div');
       const canvases = renderDiaryInto(box, entry, 3);
@@ -1096,6 +1106,7 @@
           const fig = document.createElement('figure');
           fig.className = 'page page-entry';
           fig.dataset.id = e.id;
+          fig.dataset.page = idx;
           const badge = document.createElement('span');
           badge.className = 'badge';
           fig.appendChild(badge);
@@ -1300,26 +1311,38 @@
         await loadJsPDF();
         const JsPDF = window.jspdf.jsPDF;
         const figs = [...pagesEl.querySelectorAll('figure.page')];
+
+        // Kích thước trang PDF chung, lấy theo ảnh gốc đầu tiên (để mọi trang bằng nhau)
+        let PW = 1488, PH = 2105;
+        const firstImg = figs.map(f => f.querySelector('img')).find(Boolean);
+        if (firstImg) {
+          const el0 = await loadImage(firstImg.currentSrc || firstImg.src);
+          PW = el0.naturalWidth || PW; PH = el0.naturalHeight || PH;
+        }
+        const orient = PW > PH ? 'l' : 'p';
+        const hiScale = Math.min(4, Math.max(2, Math.ceil(PW / PAGE.W))); // canvas bài đăng nét, ~ bề rộng trang
+
         let pdf = null;
         for (const fig of figs) {
-          const cv = fig.querySelector('canvas');
           const img = fig.querySelector('img');
-          let dataUrl, w, h;
-          if (cv) {
-            w = cv.width; h = cv.height;
-            dataUrl = cv.toDataURL('image/jpeg', 0.92);
-          } else if (img) {
+          const cv = fig.querySelector('canvas');
+          let dataUrl;
+          if (img) {
             const el = await loadImage(img.currentSrc || img.src);
-            w = el.naturalWidth || el.width; h = el.naturalHeight || el.height;
             const tmp = document.createElement('canvas');
-            tmp.width = w; tmp.height = h;
+            tmp.width = el.naturalWidth || el.width;
+            tmp.height = el.naturalHeight || el.height;
             tmp.getContext('2d').drawImage(el, 0, 0);
             dataUrl = tmp.toDataURL('image/jpeg', 0.85);
+          } else if (cv) {
+            const entry = entries.find(e => String(e.id) === fig.dataset.id);
+            const src = entry ? renderEntryPageHiRes(entry, parseInt(fig.dataset.page || '0', 10), hiScale) : cv;
+            dataUrl = src.toDataURL('image/jpeg', 0.92);
           } else { continue; }
-          const orient = w > h ? 'l' : 'p';
-          if (!pdf) pdf = new JsPDF({ unit: 'px', format: [w, h], orientation: orient, compress: true });
-          else pdf.addPage([w, h], orient);
-          pdf.addImage(dataUrl, 'JPEG', 0, 0, w, h);
+
+          if (!pdf) pdf = new JsPDF({ unit: 'px', format: [PW, PH], orientation: orient, compress: true });
+          else pdf.addPage([PW, PH], orient);
+          pdf.addImage(dataUrl, 'JPEG', 0, 0, PW, PH);   // vẽ đầy trang => mọi trang cùng cỡ
         }
         if (!pdf) throw new Error('Không có trang nào để xuất.');
         pdf.save('Nhat-ky-Ba-Nhat.pdf');
