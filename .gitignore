@@ -1,0 +1,10 @@
+# IDE
+.idea/
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Node (chỉ dùng khi render lại PDF)
+node_modules/

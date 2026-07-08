@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhật ký Ba Nhất — Hội Phụ nữ Bộ Công an</title>
+  <meta name="description" content="Nhật ký Ba Nhất - Hội Phụ nữ Bộ Công an, Ban Phụ nữ Công an nhân dân. Hà Nội - 2026.">
+  <meta property="og:title" content="Nhật ký Ba Nhất — Hội Phụ nữ Bộ Công an">
+  <meta property="og:description" content="Ban Phụ nữ Công an nhân dân. Hà Nội - 2026.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="images/page-01.png">
+  <style>
+    :root {
+      --page-max: 840px;
+      --accent: #1e7fd4;
+      --accent-dark: #0b4a86;
+      --bg-1: #eaf3fb;
+      --bg-2: #d3e6f7;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #123;
+      background: linear-gradient(160deg, var(--bg-1), var(--bg-2));
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    header.site {
+      text-align: center;
+      padding: 34px 20px 14px;
+    }
+    header.site h1 {
+      margin: 0;
+      font-size: clamp(20px, 4.5vw, 30px);
+      letter-spacing: .5px;
+      color: var(--accent-dark);
+    }
+    header.site p {
+      margin: 6px 0 0;
+      color: #3a6ea5;
+      font-size: clamp(13px, 2.6vw, 15px);
+    }
+
+    .book {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      padding: 20px 16px 70px;
+    }
+
+    figure.page {
+      position: relative;
+      width: 100%;
+      max-width: var(--page-max);
+      margin: 0;
+    }
+
+    figure.page img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(11, 74, 134, .18), 0 2px 8px rgba(0,0,0,.08);
+      background: #fff;
+    }
+
+    figure.page figcaption {
+      position: absolute;
+      bottom: 10px;
+      right: 14px;
+      font-size: 12px;
+      color: #fff;
+      background: rgba(11, 74, 134, .55);
+      padding: 2px 9px;
+      border-radius: 20px;
+      backdrop-filter: blur(2px);
+      pointer-events: none;
+    }
+
+    footer.site {
+      text-align: center;
+      padding: 24px 20px 50px;
+      color: #3a6ea5;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    footer.site strong { color: var(--accent-dark); }
+
+    /* Nút cuộn lên đầu */
+    #toTop {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 46px;
+      height: 46px;
+      border: none;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(11,74,134,.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+      z-index: 20;
+    }
+    #toTop.show { opacity: .92; pointer-events: auto; }
+    #toTop:hover { opacity: 1; }
+
+    @media (max-width: 600px) {
+      .book { gap: 18px; padding: 12px 10px 60px; }
+      figure.page img { border-radius: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site">
+    <h1>NHẬT KÝ BA NHẤT</h1>
+    <p>Hội Phụ nữ Bộ Công an · Ban Phụ nữ Công an nhân dân — Hà Nội 2026</p>
+  </header>
+
+  <main class="book" id="book">
+
+    <figure class="page">
+      <img src="images/page-01.png" alt="Bìa cuốn Nhật ký Ba Nhất — Hội Phụ nữ Bộ Công an, Ban Phụ nữ Công an nhân dân. Hà Nội - 2026." loading="eager" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 1 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-02.png" alt="Bìa cuốn Nhật ký Ba Nhất đặt trên nền vải." loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 2 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-03.png" alt="Trang trí: huy hiệu Phụ nữ Công an nhân dân, chim bồ câu và hoa sen. Hội Phụ nữ Bộ Công an — Ban Phụ nữ Công an nhân dân." loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 3 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-04.png" alt="Thông tin cá nhân: Họ và tên, Chức vụ, Đơn vị công tác, Điện thoại. Ban Phụ nữ Công an nhân dân — Địa chỉ: Số 47 Phạm Văn Đồng, phường Phú Diễn, TP. Hà Nội. Điện thoại: 069..., Email: PhunuCand@Gmail.com" loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 4 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-05.png" alt="TƯ CÁCH NGƯỜI CÔNG AN CÁCH MỆNH LÀ: Đối với tự mình, phải CẦN, KIỆM, LIÊM, CHÍNH. Đối với đồng sự, phải THÂN ÁI GIÚP ĐỠ. Đối với Chính phủ, phải TUYỆT ĐỐI TRUNG THÀNH. Đối với nhân dân, phải KÍNH TRỌNG, LỄ PHÉP. Đối với công việc, phải TẬN TỤY. Đối với địch, phải CƯƠNG QUYẾT, KHÔN KHÉO. Trích thư Chủ tịch Hồ Chí Minh gửi Công an khu XII, ngày 11-3-1948." loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 5 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-06.png" alt="5 LỜI THỀ DANH DỰ CỦA CÔNG AN NHÂN DÂN VIỆT NAM. 1. Tuyệt đối trung thành với Tổ quốc và nhân dân Việt Nam, với Đảng Cộng sản Việt Nam, với Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam; suốt đời phấn đấu, hy sinh vì độc lập, tự do, chủ quyền, thống nhất và toàn vẹn lãnh thổ, vì an ninh Tổ quốc. 2. Nghiêm chỉnh chấp hành chủ trương, đường lối, chính sách của Đảng, pháp luật của Nhà nước, nghị quyết, chỉ thị và Điều lệnh Công an nhân dân; sẵn sàng đi bất cứ đâu, làm bất cứ việc gì khi Tổ quốc, Đảng và nhân dân cần đến. 3. Kính trọng, lễ phép với nhân dân. Sẵn sàng bảo vệ tính mạng, tài sản, quyền và lợi ích hợp pháp của nhân dân. Suốt đời tận tụy phục vụ nhân dân, vì cuộc sống bình yên và hạnh phúc nhân dân. 4. Đề cao cảnh giác, kiên quyết, mưu trí, dũng cảm đấu tranh phòng, chống các thế lực thù địch, các loại tội phạm và các hành vi vi phạm pháp luật. 5. Ra sức học tập, thực hiện nghiêm túc 6 điều Chủ tịch Hồ Chí Minh dạy Công an nhân dân, luôn xứng đáng với danh dự và truyền thống của Công an nhân dân Việt Nam." loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 6 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-07.png" alt="Lịch năm 2026 — Bính Ngọ, đầy đủ 12 tháng. Ban Phụ nữ Công an nhân dân — Địa chỉ: Số 47 Phạm Văn Đồng, phường Phú Diễn, TP. Hà Nội." loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 7 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-08.png" alt="Nhật ký — Thứ Hai, ngày 06 tháng 7 năm 2026. Sáng nay là ngày đầu tiên tôi trở lại cơ quan sau ba ngày nghỉ phép kết hợp chuyến công tác tại Thành phố Hồ Chí Minh dự Hội thảo quốc tế. Nói là nghỉ phép nhưng thật ra cũng không nghỉ được bao nhiêu. Công việc truyền thông của Hội Phụ nữ Bộ Công an chưa bao giờ cho phép mình tắt hẳn điện thoại. Tin bài trên Fanpage vẫn phải đọc, vẫn phải chỉnh, vẫn phải suy nghĩ xem nên viết thế nào để mỗi câu chuyện đẹp đến được với nhiều người hơn. Có lẽ đã thành thói quen. Con gái út từ Pháp về nghỉ hè đã hơn một tháng. Ba ngày vừa rồi mới thực sự là khoảng thời gian hai mẹ con được ở cạnh nhau nhiều hơn. Thời gian chẳng dài, nhưng đủ để tôi thấy rằng, cuối cùng thì mọi điều mình cố gắng trong công việc cũng chỉ mong những người thân yêu được bình yên, được hạnh phúc. Tôi đến cơ quan sớm gần bốn mươi phút. Sau cơn bão số 1, Hà Nội oi nồng hơn ấy. Lễ chào cờ đầu tháng vẫn diễn ra như thường lệ. Mỗi lần đứng dưới lá cờ Tổ quốc, nghe Quốc ca vang lên, tôi lại thấy mình nhỏ bé. Mình được sống, được làm việc trong hòa bình là nhờ biết bao người đã ngã xuống… Nghĩ vậy, tự nhiên thấy những áp lực của mình hôm nay cũng nhẹ đi rất nhiều. Chào cờ xong, lên phòng làm việc. Trên bàn là tập văn bản của ba ngày nghỉ phép cùng hai chuyến công tác nối tiếp ở Gia Lai và Thành phố Hồ Chí Minh." loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 8 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-09.png" alt="Nhật ký (tiếp). Giải quyết thật nhanh để sang việc tham gia ý kiến vào dự thảo Báo cáo Chi bộ tháng 6. Đọc từng mục, tôi vẫn thấy nhiều điều cần chỉnh. Báo cáo của Chi bộ thì phải thể hiện vai trò lãnh đạo của Chi bộ, chứ không chỉ là liệt kê công việc chuyên môn của Ban. Tôi ngồi sửa từng câu, từng chữ. Có người hỏi sao cứ phải kỹ như vậy. Tôi cũng không biết trả lời thế nào. Chỉ nghĩ đơn giản, đã là văn bản mang tên Chi bộ thì phải làm cho cẩn thận… Thời gian trôi nhanh đã gần hết buổi sáng. Ba phút chạy xe về nhà. Hai mẹ con ăn trưa với ức gà luộc và rau muống luộc. Đang cùng nhau giảm cân nên bữa cơm rất đơn giản. Vậy mà vui. 13 giờ, tôi quay lại cơ quan. 14 giờ, Chi bộ họp. Giữa cuộc họp, tôi được phân công sang Phòng 1 dự Lễ công bố Quyết định điều động hai đồng chí của Ban về nhận công tác tại đơn vị mới. Tôi thay mặt lãnh đạo Ban phát biểu chúc mừng hai đồng chí. Tôi cũng cảm ơn Đảng ủy, lãnh đạo Cục và Phòng 1 đã tạo điều kiện để cán bộ được luân chuyển, rèn luyện ở môi trường mới. Tôi luôn nghĩ, luân chuyển không phải là chia tay. Đó là một cơ hội khác để trưởng thành. Cuối phần công bố Quyết định. Hai cái ôm thật chặt. Không cần nói nhiều. Chỉ mong các em luôn giữ được sự nhiệt huyết như những ngày đầu bước vào ngành. 15 giờ 20 phút, tôi trở lại phòng họp. Chi bộ bước vào phần góp ý dự thảo Báo cáo tháng Sáu. Tôi là người phát biểu gần cuối." loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 9 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-10.png" alt="Nhật ký (tiếp). Tôi chia sẻ rằng đây là cuộc sinh hoạt đầu tiên của đồng chí Bí thư trên cương vị mới. Điều tôi mong nhất không phải là một cuộc họp thật dài hay một bài phát biểu thật hay, mà là một cuộc họp được chuẩn bị chu đáo, có chương trình rõ ràng, tài liệu đầy đủ và sự thống nhất trước giữa lãnh đạo đơn vị. Theo tôi, người đứng đầu không chỉ giải quyết công việc. Điều quan trọng hơn là tạo được niềm tin trong tập thể. Mà niềm tin thì bắt đầu từ những việc rất nhỏ. Thông tin đầy đủ, chuẩn bị kỹ, lắng nghe và cùng chịu trách nhiệm. Tôi cũng trao đổi về việc sử dụng cán bộ hợp đồng trong những công việc liên quan đến văn thư, văn bản hành chính. Công nghệ, kể cả AI, có thể hỗ trợ rất nhiều. Nhưng AI không thể thay thế trách nhiệm của con người. Một văn bản chỉ cần sai một dòng cũng có thể dẫn đến rất nhiều hệ quả. Càng ứng dụng công nghệ càng phải cẩn trọng. Liên quan đến Cuộc thi Tiếng Anh, tôi cũng đề nghị Ban tiếp tục rà soát kỹ quy định về thành phần tham gia vòng chung kết sau khi nhận được phản ánh từ cơ sở để khi triển khai không phát sinh vướng mắc… Sau phần thảo luận, đồng chí Thiếu tướng Ngô Hoài Thu phát biểu chỉ đạo... Điều tôi nhớ nhất không chỉ là những nội dung cụ thể được nhắc đến (đã được kết luận và ghi chép đầy đủ trong biên bản cuộc họp) Mà là tinh thần của buổi họp. Làm việc phải có nền nếp, họp phải có chương trình, tài liệu phải chuẩn bị trước. Việc chưa hoàn thành phải nói rõ. Ai chịu trách nhiệm thì phải chịu trách nhiệm, dũng cảm nhận chưa hoàn thành nhiệm vụ, trừ điểm thi đua." loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 10 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-11.png" alt="Nhật ký (tiếp). Không né tránh, không để việc nhỏ lặp lại thành thói quen.... và hãy đổi mới theo hướng tốt hơn, chuẩn hơn, đúng quy trình, quy định hơn, nói phải đi đôi với làm, đừng hứa, đừng nhận trách nhiệm rồi bỏ qua mà không thực hiện đúng. Chiều muộn. Tôi ngồi lại trong phòng làm việc thêm một lúc. Thực lòng tôi không muốn cuộc họp phải phát biểu góp ý quá nhiều về những thiếu sót của ai... Cảm giác ấy dễ làm người ta hao mòn. Nhưng rồi tôi lại nghĩ đến những người đi trước. Những Mẹ Việt Nam Anh hùng. Những Anh hùng liệt sĩ. Những thương binh mang thương tật suốt đời. Họ đã hy sinh những điều lớn lao hơn rất nhiều để đất nước có được ngày hôm nay. So với những mất mát ấy, những điều tôi đang trải qua chỉ là một thử thách nhỏ trên con đường mình đã chọn. Có lẽ cuộc sống sẽ luôn có những điều không như ý. Mình không thể chọn người sẽ đồng hành với mình trên mọi chặng đường. Cũng không thể bắt tất cả mọi người phải nghĩ giống mình. Nhưng mình luôn có quyền lựa chọn cách sống của chính mình. Tôi vẫn muốn giữ sự chỉn chu trong công việc. Vẫn muốn giữ sự tử tế trong cách đối xử với mọi người. Vẫn muốn góp ý khi thấy điều chưa đúng. Không phải để hơn thua với ai. Cũng không phải để chứng minh mình đúng. Chỉ vì tôi mong tập thể mình tốt hơn hôm qua một chút. Thế thôi. Tối nay, trước khi khép lại một ngày, tôi tự nhắc mình một điều rất giản dị: Đừng để những điều chưa tốt của người khác làm mình đánh mất những điều tốt đẹp của chính mình." loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 11 / 12</figcaption>
+    </figure>
+
+    <figure class="page">
+      <img src="images/page-12.png" alt="Bìa sau — huy hiệu Phụ nữ Công an nhân dân, chim bồ câu và hoa sen. Ban Phụ nữ Công an nhân dân — Địa chỉ: Số 47 Phạm Văn Đồng, phường Phú Diễn, TP. Hà Nội. Điện thoại: 069..., Email: PhunuCand@Gmail.com" loading="lazy" decoding="async" width="1488" height="2105">
+      <figcaption>Trang 12 / 12</figcaption>
+    </figure>
+
+  </main>
+
+  <footer class="site">
+    <strong>BAN PHỤ NỮ CÔNG AN NHÂN DÂN</strong><br>
+    Địa chỉ: Số 47 Phạm Văn Đồng, phường Phú Diễn, TP. Hà Nội<br>
+    Điện thoại: 069… · Email: PhunuCand@Gmail.com
+  </footer>
+
+  <button id="toTop" aria-label="Lên đầu trang" title="Lên đầu trang">↑</button>
+
+  <script>
+    var btn = document.getElementById('toTop');
+    window.addEventListener('scroll', function () {
+      if (window.scrollY > 500) btn.classList.add('show');
+      else btn.classList.remove('show');
+    });
+    btn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+
+</body>
+</html>
