@@ -1,6 +1,6 @@
 # Nhật ký cá nhân qua Firebase (đăng nhập tài khoản)
 
-Trang đã cấu hình sẵn Firebase (project `nhat-ky-ba-nhat`). Mỗi người **đăng ký / đăng nhập**
+Trang đã cấu hình sẵn Firebase (project `nhat-ky-ba-nhat-94047`). Mỗi người **đăng ký / đăng nhập**
 bằng email + mật khẩu, và **chỉ thấy + sửa được cuốn nhật ký của riêng mình** — không lẫn với
 người khác. Dữ liệu lưu trên **Firestore**, mỗi bài gắn `uid` của chủ tài khoản. Nếu mất mạng /
 lỗi kết nối, trang tự chuyển sang lưu tạm trên máy (1 cuốn cục bộ, không cần đăng nhập).
@@ -67,7 +67,7 @@ Console (Rules chặn ghi từ web), nên không ai tự cấp quyền admin cho
 > xóa ngay trong màn Quản trị hoặc trong collection `entries` trên Firestore Database.
 
 **Firestore Database** cũng cần đã bật (Build → Firestore Database → Create, vùng
-`asia-southeast1`). ✅ Đã bật.
+`asia-southeast1`).
 
 ## Chạy / kiểm tra cục bộ
 Trang phải mở qua HTTP (không mở bằng `file://`, vì import Firebase qua CDN sẽ bị chặn).
