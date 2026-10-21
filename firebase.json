@@ -7,6 +7,18 @@
     "ignore": [
       "_headers",
       "**/.*"
+    ],
+    "redirects": [
+      {
+        "source": "/",
+        "destination": "https://nhat-ky-ba-nhat.hoanganhfallinginlove.workers.dev/",
+        "type": 301
+      },
+      {
+        "source": "/:path*",
+        "destination": "https://nhat-ky-ba-nhat.hoanganhfallinginlove.workers.dev/:path*",
+        "type": 301
+      }
     ]
   }
 }

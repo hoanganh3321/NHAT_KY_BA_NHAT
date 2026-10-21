@@ -4,10 +4,10 @@ Kiến trúc miễn phí, tính cho khoảng 50.000 hội viên:
 
 | Phần | Dịch vụ | Ghi chú |
 |---|---|---|
-| Trang web (HTML, ảnh, phông) | **Cloudflare Pages** (miễn phí, không giới hạn băng thông) | Tự cập nhật mỗi lần push nhánh `main` |
+| Trang web (HTML, ảnh, phông) | **Cloudflare Workers** (file tĩnh: miễn phí, không giới hạn lượt truy cập) | **https://nhat-ky-ba-nhat.hoanganhfallinginlove.workers.dev**, tự cập nhật mỗi lần push nhánh `main` (cấu hình `wrangler.jsonc`) |
 | Đăng nhập | **Firebase Authentication** (project `nhat-ky-ba-nhat-94047`) | Email + mật khẩu, có "Quên mật khẩu?" |
 | Dữ liệu | **Firestore** (gói Spark miễn phí) | Mỗi người **1 document** `diaries/{uid}` |
-| Link cũ `nhat-ky-ba-nhat-94047.web.app` | Firebase Hosting | Chỉ chuyển hướng sang link Cloudflare |
+| Link cũ `nhat-ky-ba-nhat-94047.web.app` | Firebase Hosting | Chuyển hướng 301 sang link Cloudflare (`firebase.json` → `redirects`) |
 
 ## Cấu trúc thư mục
 - `public/` — toàn bộ trang được đưa lên mạng (`index.html`, `images/` WebP, `fonts/`, `docs/img.png`,
@@ -56,7 +56,7 @@ không ai tự cấp quyền cho mình được.
 
 ## Cấu hình một lần trên Firebase Console
 - **Authentication → Sign-in method**: bật Email/Password.
-- **Authentication → Settings → Authorized domains**: có tên miền Cloudflare (`*.pages.dev`) và
+- **Authentication → Settings → Authorized domains**: có `nhat-ky-ba-nhat.hoanganhfallinginlove.workers.dev` và
   `nhat-ky-ba-nhat-94047.web.app`.
 - **Authentication → Settings → Sign-up quota**: tăng trước các buổi đăng ký tập trung (mặc định
   khoảng 100 tài khoản/giờ cho cùng một địa chỉ IP).
