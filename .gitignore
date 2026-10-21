@@ -8,3 +8,9 @@ desktop.ini
 
 # Node (chỉ dùng khi render lại PDF)
 node_modules/
+
+# Ảnh chụp màn hình tạm
+docs2/
+
+# Firebase CLI
+.firebase/

@@ -79,7 +79,19 @@ Thấy khung **Đăng nhập / Đăng ký** dưới mục *Viết thêm nhật k
 tài khoản thử → viết một bài → đăng xuất rồi đăng nhập tài khoản khác để kiểm tra không thấy
 bài của nhau.
 
-## Xuất bản GitHub Pages
+## Xuất bản Firebase Hosting (link chính)
+Trang chạy tại: **https://nhat-ky-ba-nhat-94047.web.app**
+
+Cấu hình nằm trong `firebase.json` (chỉ đưa lên `index.html`, `docs/`, `fonts/`, `images/`;
+bỏ qua `docs2/`, file `.md`, `.docx`) và `.firebaserc` (project `nhat-ky-ba-nhat-94047`).
+
+Mỗi lần sửa code, đưa bản mới lên bằng:
+```
+npx -y firebase-tools@15.34.0 deploy --only hosting
+```
+Lần đầu trên máy mới cần đăng nhập: `npx -y firebase-tools@15.34.0 login`.
+
+## Xuất bản GitHub Pages (link phụ)
 Repo: `hoanganh3321/NHAT_KY_BA_NHAT`, nhánh `main`.
 1. GitHub → repo → **Settings → Pages**.
 2. **Source: Deploy from a branch** → Branch `main` → thư mục `/ (root)` → **Save**.
