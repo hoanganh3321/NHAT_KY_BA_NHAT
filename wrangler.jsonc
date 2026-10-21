@@ -3,6 +3,8 @@
 {
   "name": "nhat-ky-ba-nhat",
   "compatibility_date": "2025-09-01",
+  "workers_dev": true,      // bật link nhat-ky-ba-nhat.<tài khoản>.workers.dev
+  "preview_urls": false,    // chỉ một link chính thức
   "assets": {
     "directory": "./public"
   }
