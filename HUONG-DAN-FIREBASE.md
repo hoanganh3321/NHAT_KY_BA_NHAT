@@ -13,28 +13,58 @@ tab **Sign-in method** → chọn **Email/Password** → bật **Enable** → **
 
 Nếu chưa bật, khi đăng nhập sẽ báo lỗi: *"Chưa bật đăng nhập Email/Mật khẩu…"*.
 
-### 2. Cập nhật Rules Firestore (mỗi người chỉ đọc/ghi bài của mình)
+### 2. Cập nhật Rules Firestore (mỗi người chỉ đọc/ghi bài của mình, admin quản lý tất cả)
 Firebase Console → **Firestore Database → tab Rules → Publish**:
 
    ```
    rules_version = '2';
    service cloud.firestore {
      match /databases/{database}/documents {
+       function isAdmin() {
+         return request.auth != null &&
+                exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+       }
+       function isOwner() {
+         return request.auth != null && resource.data.uid == request.auth.uid;
+       }
+
        match /entries/{doc} {
-         allow read:          if request.auth != null && resource.data.uid == request.auth.uid;
-         allow create:        if request.auth != null && request.resource.data.uid == request.auth.uid;
-         allow update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+         allow read:           if isAdmin() || isOwner();
+         allow create:         if request.auth != null && request.resource.data.uid == request.auth.uid;
+         allow update, delete: if isAdmin() || isOwner();
+       }
+
+       // Danh sách admin: mỗi người chỉ đọc được document của chính mình, không ai ghi từ web
+       match /admins/{uid} {
+         allow read:  if request.auth != null && request.auth.uid == uid;
+         allow write: if false;
        }
      }
    }
    ```
 
-   Rule này bảo đảm: phải đăng nhập mới đọc/ghi được, và **chỉ đụng tới bài có `uid` trùng
-   với tài khoản của mình**. Không ai xem hay sửa được nhật ký của người khác.
+   Rule này bảo đảm: phải đăng nhập mới đọc/ghi được. Người dùng thường **chỉ đụng tới bài có
+   `uid` trùng với tài khoản của mình**. Chỉ tài khoản có trong collection `admins` mới xem, sửa
+   và xóa được bài của mọi người.
+
+### 3. Cấp quyền admin (màn Quản trị)
+1. Tài khoản admin đăng ký trên trang như bình thường.
+2. Firebase Console → **Authentication → Users** → sao chép **User UID** của tài khoản đó.
+3. **Firestore Database → Start collection** → Collection ID: `admins` → Document ID: dán
+   **UID** vừa sao chép → thêm 1 trường bất kỳ (ví dụ `role` = `admin`) → **Save**.
+4. Đăng nhập lại trên trang: cạnh nút *Đăng xuất* sẽ có nút **⚙ Quản trị**. Màn này liệt kê bài
+   của tất cả người dùng, có tìm kiếm, lọc theo người dùng, Xem / Tải ảnh / Sửa / Xóa và
+   **Xuất toàn bộ** ra file JSON.
+
+Muốn thu hồi quyền: xóa document của người đó trong `admins`. Collection này chỉ sửa được trên
+Console (Rules chặn ghi từ web), nên không ai tự cấp quyền admin cho mình được.
+
+> Bài đăng từ nay lưu kèm `email` và `ownerName` của người viết để admin biết bài của ai. Bài
+> đăng trước đó chỉ hiện theo `uid` (8 ký tự đầu) trong màn Quản trị.
 
 > **Lưu ý dữ liệu cũ:** các bài đăng trước đây (khi chưa có đăng nhập) không có trường `uid`
-> nên sẽ không hiện với bất kỳ ai. Muốn dọn, vào Firestore Database xóa các document cũ trong
-> collection `entries`.
+> nên không hiện với người dùng nào, chỉ admin thấy (nhãn *bài cũ, không có chủ*). Muốn dọn,
+> xóa ngay trong màn Quản trị hoặc trong collection `entries` trên Firestore Database.
 
 **Firestore Database** cũng cần đã bật (Build → Firestore Database → Create, vùng
 `asia-southeast1`). ✅ Đã bật.
