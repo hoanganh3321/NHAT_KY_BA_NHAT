@@ -1,14 +1,12 @@
 {
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
-    "public": ".",
+    "public": "public",
     "ignore": [
-      "firebase.json",
-      ".firebaserc",
-      "**/.*",
-      "**/node_modules/**",
-      "docs2/**",
-      "*.md",
-      "*.docx"
+      "_headers",
+      "**/.*"
     ]
   }
 }

@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function isSelf(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+    // Mỗi người 1 cuốn nhật ký: diaries/{uid} = { uid, email, ownerName, entries[], count, updatedAt }
+    function validDiary(uid) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['uid', 'email', 'ownerName', 'entries', 'count', 'updatedAt'])
+          && d.uid == uid
+          && d.entries is list && d.entries.size() <= 100
+          && d.count == d.entries.size()
+          && d.email is string && d.email.size() <= 200
+          && d.ownerName is string && d.ownerName.size() <= 100
+          && d.updatedAt == request.time;
+    }
+
+    match /diaries/{uid} {
+      allow read:   if isSelf(uid) || isAdmin();
+      allow create: if isSelf(uid) && validDiary(uid);
+      allow update: if (isSelf(uid) || isAdmin()) && validDiary(uid);
+      allow delete: if isAdmin();
+    }
+
+    // Danh sách admin: mỗi người chỉ đọc được document của chính mình, không ai ghi từ web
+    match /admins/{uid} {
+      allow read:  if isSelf(uid);
+      allow write: if false;
+    }
+  }
+}

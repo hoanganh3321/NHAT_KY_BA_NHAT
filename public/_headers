@@ -1,0 +1,8 @@
+# Cloudflare Pages: cho trình duyệt lưu ảnh/phông chữ lâu dài (lần sau mở trang gần như không tải lại).
+# Khi thay ảnh, đặt tên file mới để mọi người nhận bản mới.
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/docs/*
+  Cache-Control: public, max-age=2592000
