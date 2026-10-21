@@ -1,0 +1,9 @@
+// Cloudflare Workers (static assets): chỉ đưa thư mục public/ lên mạng.
+// Cloudflare tự chạy "npx wrangler deploy" mỗi lần push nhánh main.
+{
+  "name": "nhat-ky-ba-nhat",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./public"
+  }
+}
